@@ -21,3 +21,28 @@ func TestContains(t *testing.T) {
 		})
 	}
 }
+
+func TestContainsClosedInterval(t *testing.T) {
+	if !Contains(2, 5, 5) {
+		t.Error("closed interval must contain upper endpoint: Contains(2, 5, 5) = false, want true")
+	}
+
+	const maxInt = int(^uint(0) >> 1)
+	const minInt = -maxInt - 1
+	for _, tt := range []struct {
+		first, last, value int
+		want               bool
+	}{
+		{first: 5, last: 5, value: 5, want: true},
+		{first: 5, last: 5, value: 4},
+		{first: 5, last: 5, value: 6},
+		{first: minInt, last: maxInt, value: minInt, want: true},
+		{first: minInt, last: maxInt, value: maxInt, want: true},
+		{first: maxInt, last: maxInt, value: maxInt, want: true},
+		{first: maxInt, last: minInt, value: 0},
+	} {
+		if got := Contains(tt.first, tt.last, tt.value); got != tt.want {
+			t.Errorf("Contains(%d, %d, %d) = %t, want %t", tt.first, tt.last, tt.value, got, tt.want)
+		}
+	}
+}
